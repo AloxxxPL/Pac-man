@@ -1,5 +1,4 @@
-from constants import (CELL_SIZE, MAZE_GRID_ROWS, MAZE_GRID_COLUMNS,
-                       MAZE_LEVEL_START_X, MAZE_LEVEL_START_Y)
+from constants import (CELL_SIZE, MAZE_GRID_ROWS, MAZE_GRID_COLUMNS,MAZE_LEVEL_START_X, MAZE_LEVEL_START_Y)
 
 # Poziom labiryntu #1:
 # Liczba wierszy musi być równa liczbie wierszy siatki minus 2 wiersze dla interfejsu użytkownika
