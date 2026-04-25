@@ -1,5 +1,7 @@
 import turtle
 import random
+import os
+# import winsound
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT, CELL_SIZE, ENEMY_NUMBER
 from renderer import Wall, Pellet, PowerPellet, UiPen
 from actors import Player, Enemy
@@ -26,8 +28,7 @@ def bind_controls(screen, player):
     screen.onkeypress(player.turn_down, "Down")
 
 
-def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, player_start_x, player_start_y, enemies,
-              _ui_cache=[None, None, None, None]):
+def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, player_start_x, player_start_y, enemies,_ui_cache=[None, None, None, None]):
     "Aktualizacje w czasie rzeczywistym"
     # Aktualizuj wynik, życia i komunikaty gry – tylko gdy coś się zmieniło
     ui_state = (player.score, player.lives, len(pellet_pen.stamps), len(power_pen.stamps))
@@ -38,6 +39,8 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
     # Kolizja: gracz-kulka
     for (px, py), stamp_id in list(pellet_pen.stamps.items()):
         if player.distance(px, py) < CELL_SIZE / 2 and (px, py) != (player_start_x, player_start_y):
+            os.system("aplay eat.wav > /dev/null 2>&1 &")
+            # winsound.PlaySound("eat.wav", winsound.SND_ASYNC)
             pellet_pen.clearstamp(stamp_id)
             del pellet_pen.stamps[(px, py)]
             player.score += 2
@@ -48,6 +51,8 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
     # Kolizja: gracz-kulka mocy
     for (px, py), stamp_id in list(power_pen.stamps.items()):
         if player.distance(px, py) < CELL_SIZE / 2:
+            os.system("aplay eat.wav > /dev/null 2>&1 &")
+            # winsound.PlaySound("eat.wav", winsound.SND_ASYNC)
             power_pen.clearstamp(stamp_id)
             del power_pen.stamps[(px, py)]
             player.score += 50
@@ -64,6 +69,8 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
         enemy.go_after_player()
         # Kolizja: gracz-wróg
         if enemy.distance(player) < CELL_SIZE / 2:
+            os.system("aplay death.wav > /dev/null 2>&1 &")
+            # winsound.PlaySound("death.wav", winsound.SND_ASYNC)
             # Upewnij się, że gracz nie odradza się blisko wroga
             safe_spots = []
             for pellet in pellet_pen.pellets:
@@ -152,6 +159,8 @@ def main():
         enemy.shape(random.choice(enemy_colors))
         enemies.append(enemy)
     # Ustawienia startu gry
+    os.system("aplay start_up.wav > /dev/null 2>&1 &")
+    # winsound.PlaySound("start_up.wav", winsound.SND_ASYNC)
     screen.ontimer(lambda: bind_controls(screen, player), 2500)
     for enemy in enemies:
         screen.ontimer(enemy.start_move, 2500)
