@@ -125,16 +125,12 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
         _ui_cache[0], _ui_cache[1], _ui_cache[2], _ui_cache[3] = ui_state
     # Kolizja: gracz-kulka
     for (px, py), stamp_id in list(pellet_pen.stamps.items()):
-        if player.distance(px, py) < CELL_SIZE / 2 and (px, py) != (player_start_x, player_start_y):
+        if player.distance(px, py) < CELL_SIZE / 2:
             os.system("aplay eat.wav > /dev/null 2>&1 &")
             # winsound.PlaySound("eat.wav", winsound.SND_ASYNC)
             pellet_pen.clearstamp(stamp_id)
             del pellet_pen.stamps[(px, py)]
             player.score += 2
-        # Pomiń punkty na starcie gry z pierwszej kulki
-        elif player.distance(px, py) < CELL_SIZE / 2 and (px, py) == (player_start_x, player_start_y):
-            pellet_pen.clearstamp(stamp_id)
-            del pellet_pen.stamps[(px, py)]
     # Kolizja: gracz-kulka mocy
     for (px, py), stamp_id in list(power_pen.stamps.items()):
         if player.distance(px, py) < CELL_SIZE / 2:
@@ -163,6 +159,8 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
             for pellet in pellet_pen.pellets:
                 if all(enemy.distance(pellet) > CELL_SIZE * 5 for enemy in enemies):
                     safe_spots.append(pellet)
+            if not safe_spots:
+                safe_spots = list(pellet_pen.pellets)
             player.goto(random.choice(safe_spots))
             player.lives -= 1        
     # Koniec levelu – sprawdź czy był ostatni
@@ -268,6 +266,8 @@ def main():
         for pellet in pellets:
             if player.distance(pellet) > CELL_SIZE * 5:
                 safe_spots.append(pellet)
+        if not safe_spots:
+            safe_spots = pellets
         enemy_start_x, enemy_start_y = random.choice(safe_spots)
         enemy = Enemy(enemy_start_x, enemy_start_y, walls, player)
         enemy.shape(random.choice(enemy_colors))

@@ -1,4 +1,4 @@
-from constants import (CELL_SIZE, MAZE_GRID_ROWS, MAZE_GRID_COLUMNS, MAZE_LEVEL_START_X, MAZE_LEVEL_START_Y)
+from constants import (CELL_SIZE, MAZE_GRID_ROWS, MAZE_GRID_COLUMNS, MAZE_LEVEL_START_X, MAZE_LEVEL_START_Y, DEBUG_MODE)
 
 # Poziom labiryntu #1:
 # Liczba wierszy musi być równa liczbie wierszy siatki minus 2 wiersze dla interfejsu użytkownika
@@ -42,7 +42,7 @@ maze_level_2 = [
     "X.X   X   X   X   X   X   X   X.X",
     "X.XXXXX.XXXXX.XXXXX.XXXXX.XXXXX.X",
     "X.......................O.......X",
-    "XXXXX.XXXXXXXXXXXXX.XXXXXXXXXXXXX",
+    "X.XXX.XXXXXXXXXXXXX.XXXXXXXXXXXXX",
     "X.....X.....X.....X.X.....X.....X",
     "X.XXX.X.XXX.X.XXX.X.X.XXX.X.XXX.X",
     "X.X X.X.X X.X.X X.X.X.X X.X.X X.X",
@@ -119,6 +119,9 @@ def calculate_maze_data(maze_level):
                 pellets.append((character_x, character_y))
             elif character == "O":
                 power_pellets.append((character_x, character_y))
-    # Zwróć listy ze wszystkimi współrzędnymi.
-    # Umożliwia to późniejsze pobranie tych danych w innych plikach i zapisanie jako zmienna
+
+    if DEBUG_MODE:
+        pellets = [pellets[0]] if pellets else []
+        power_pellets = [power_pellets[0]] if power_pellets else []
+
     return walls, pellets, power_pellets
