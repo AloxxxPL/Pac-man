@@ -128,10 +128,11 @@ class Enemy(Actor):
         self.state = "stop"
         self.walls = set(walls)
         self.player = player
+        self.move_speed = ENEMY_MOVE_SPEED
 
     def move(self):
         if self.state != "stop":
-            self.forward(ENEMY_MOVE_SPEED)
+            self.forward(self.move_speed)
             if round(self.ycor()) > SCREEN_HEIGHT / 2 - 2 * CELL_SIZE:
                 self.sety(-SCREEN_HEIGHT / 2)
             elif round(self.ycor()) < -SCREEN_HEIGHT / 2:
