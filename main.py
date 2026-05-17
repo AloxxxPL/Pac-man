@@ -227,13 +227,21 @@ def main():
     screen.register_shape("pink_enemy.gif")
     screen.register_shape("red_enemy.gif")
     screen.register_shape("wall.gif")
+
+    # Utwórz LevelManager
+    level_manager = LevelManager()
+
+    # Załaduj pierwszą mapę
+    current_maze = level_manager.get_current_maze()
+
     # Utwórz instancje renderowania
-    wall_pen = Wall()
-    pellet_pen = Pellet()
-    power_pen = PowerPellet()
+    wall_pen = Wall(current_maze)
+    pellet_pen = Pellet(current_maze)
+    power_pen = PowerPellet(current_maze)
     ui_pen = UiPen()
     score_pen = UiPen()
     lives_pen = UiPen()
+
     # Wywołaj metody instancji i pobierz atrybuty
     wall_pen.draw()
     walls = wall_pen.walls
@@ -241,13 +249,16 @@ def main():
     pellets = pellet_pen.pellets
     power_pen.draw()
     ui_pen.draw_ui_area()
+
     # Pozycja startowa gracza
     player_start_coor = random.choice(pellet_pen.pellets)
     player_start_x = player_start_coor[0]
     player_start_y = player_start_coor[1]
+
     # Utwórz Pac-Mana
     player = Player(walls)
     player.goto(player_start_x, player_start_y)
+
     # Utwórz wrogów
     enemy_colors = ["green_enemy.gif", "pink_enemy.gif", "red_enemy.gif"]
     enemies = []
@@ -261,14 +272,14 @@ def main():
         enemy = Enemy(enemy_start_x, enemy_start_y, walls, player)
         enemy.shape(random.choice(enemy_colors))
         enemies.append(enemy)
+
     # Ustawienia startu gry
     os.system("aplay start_up.wav > /dev/null 2>&1 &")
-    # winsound.PlaySound("start_up.wav", winsound.SND_ASYNC)
     screen.ontimer(lambda: bind_controls(screen, player), 2500)
     for enemy in enemies:
         screen.ontimer(enemy.start_move, 2500)
+
     # Włącz aktualizacje w czasie rzeczywistym
-    level_manager = LevelManager()
     game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, player_start_x, player_start_y, enemies, level_manager)
     screen.mainloop()
 
