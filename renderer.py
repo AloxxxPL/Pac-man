@@ -5,15 +5,16 @@ from constants import CELL_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH
 
 class Pen(turtle.Turtle):
 
-    def __init__(self, maze):
+    def __init__(self, maze=None):
         super().__init__()
         self.hideturtle()
         self.penup()
         self.color("silver")
         self.speed(0)
         # Pobierz wszystkie współrzędne z poziomu labiryntu
-        self.walls, self.pellets, self.power_pellets = calculate_maze_data(
-            maze)
+        if maze is not None:
+            self.walls, self.pellets, self.power_pellets = calculate_maze_data(
+                maze)
 
 
 class Wall(Pen):
