@@ -32,6 +32,68 @@ maze_level_1 = [
     "XXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXX"
 ]
 
+# Poziom labiryntu #2:
+maze_level_2 = [
+    "XXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXX",
+    "XO.............................OX",
+    "X.XXXXX.XXXXX.XXXXX.XXXXX.XXXXX.X",
+    "X.X   X.X   X.X   X.X   X.X   X.X",
+    "X.X XXX.X XXX.X XXX.X XXX.X XXX.X",
+    "X.X   X   X   X   X   X   X   X.X",
+    "X.XXXXX.XXXXX.XXXXX.XXXXX.XXXXX.X",
+    "X.......................O.......X",
+    "XXXXX.XXXXXXXXXXXXX.XXXXXXXXXXXXX",
+    "X.....X.....X.....X.X.....X.....X",
+    "X.XXX.X.XXX.X.XXX.X.X.XXX.X.XXX.X",
+    "X.X X.X.X X.X.X X.X.X.X X.X.X X.X",
+    "X.X X.X.X X.X.X X.X.X.X X.X.X X.X",
+    "X.X XXX.X XXX.X XXX.X XXX.X XXX.X",
+    "X.X   X   X   X   X   X   X   X.X",
+    "X.XXX.XXXXX.XXXXX.XXXXX.XXXXX.X.X",
+    "X.X X.X   X   X   X   X   X X.X  ",
+    "X.X X.X.XXX.XXXXX.XXXXX.XXX.X.X X",
+    "X.X   X.X     X     X   X   X.X  ",
+    "XXX XXX.X XXXXX XXX XXX X X XXX X",
+    "X.X   X.X         X X.X     X.X  ",
+    "X.X XXX.X.X XXX XXX XXX X.X XXX.X",
+    "X.X X X.X.X X     X X X.X.X X X.X",
+    "X.X XXX.X.X XXXXX X X.X.X XXX.X.X",
+    "XO.....X.....X...X.X.....X.....OX",
+    "XXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXX"
+]
+
+# Poziom labiryntu #3:
+maze_level_3 = [
+    "XXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXX",
+    "XO...................O.........OX",
+    "X.XXX.XXX.XXX.XXX.XXX.XXX.XXX.X.X",
+    "X.X X.X X.X X.X X.X X.X X.X X X.X",
+    "X.X XXX.X XXX.X XXX.X XXX.X XXX X",
+    "X.X   X.X X   X   X X   X.X X   X",
+    "X.XXX X.X X.XXX.X.X.XXX.X.X X.XXX",
+    "X.  X X.X X.  X X X.  X X.X X.  X",
+    "XX.X XXX.X X.X XXX X.X XXX.X X.X ",
+    "X..X     X X X   X X X     X X X ",
+    "X.XXX.XXX.X X XXX.X X.XXX.X XXX.X",
+    "X.X   X   X X X   X X.X   X X   X",
+    "X.X XXX.XXX.X X XXX.X.X XXX XXX.X",
+    "X.X X   X   X X X   X.X X   X   X",
+    "X.X X.XXX.XXX.X XXX.X X X.XXX.XXX",
+    "X.X X.X   X   X X   X X X.X   X  ",
+    "X.X X.X.XXX.XXX X XXX XXX.X XXX.X",
+    "X.X X X.X   X   X X   X   X X   X",
+    "X.X X XXX.X XXX.X X.XXX.X XXX.X.X",
+    "X.X X   X X X   X X.X   X   X X.X",
+    "X.XXX.X XXX X.XXX X.X.XXX.XXX X.X",
+    "X.X   X X   X.X   X X.X   X   X.X",
+    "X.X XXX X.XXX.X XXX X.X XXX.XXX.X",
+    "X....X...X.....X.....X.....X.....",
+    "XO.............................OX",
+    "XXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXX"
+]
+
+maze_levels = [maze_level_1, maze_level_2, maze_level_3]
+
 
 def calculate_maze_data(maze_level):
     "Obliczanie współrzędnych labiryntu"
