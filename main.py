@@ -2,9 +2,10 @@ import turtle
 import random
 import os
 # import winsound
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, CELL_SIZE, ENEMY_NUMBER
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, CELL_SIZE, ENEMY_NUMBER, ENEMY_MOVE_SPEED, PLAYER_MOVE_SPEED
 from renderer import Wall, Pellet, PowerPellet, UiPen
 from actors import Player, Enemy
+from mazes import maze_levels
 
 
 def init_screen():
@@ -26,6 +27,36 @@ def bind_controls(screen, player):
     screen.onkeypress(player.turn_left, "Left")
     screen.onkeypress(player.turn_up, "Up")
     screen.onkeypress(player.turn_down, "Down")
+
+
+class LevelManager:
+    "Zarządza poziomami gry i trudnością wrogów"
+
+    def __init__(self):
+        self.current_level = 0
+        self.max_level = len(maze_levels) - 1
+
+    def get_current_maze(self):
+        "Zwróć mapę bieżącego poziomu"
+        return maze_levels[self.current_level]
+
+    def next_level(self):
+        "Przejdź na następny poziom. Zwróć True jeśli jest, False jeśli koniec gry"
+        if self.current_level < self.max_level:
+            self.current_level += 1
+            return True
+        return False
+
+    def is_game_won(self):
+        "Sprawdź czy gracz wygrał (ukończył ostatni level)"
+        return self.current_level == self.max_level
+
+    def get_enemy_speed(self):
+        "Zwróć prędkość wrogów dla bieżącego levelu"
+        base_speed = ENEMY_MOVE_SPEED
+        level_bonus = self.current_level * 2
+        max_speed = PLAYER_MOVE_SPEED
+        return min(base_speed + level_bonus, max_speed)
 
 
 def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, player_start_x, player_start_y, enemies,_ui_cache=[None, None, None, None]):
