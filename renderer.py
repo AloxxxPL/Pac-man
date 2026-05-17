@@ -1,11 +1,11 @@
 import turtle
-from mazes import calculate_maze_data, maze_level_1
+from mazes import calculate_maze_data, maze_levels
 from constants import CELL_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH
 
 
 class Pen(turtle.Turtle):
 
-    def __init__(self):
+    def __init__(self, maze):
         super().__init__()
         self.hideturtle()
         self.penup()
@@ -13,7 +13,7 @@ class Pen(turtle.Turtle):
         self.speed(0)
         # Pobierz wszystkie współrzędne z poziomu labiryntu
         self.walls, self.pellets, self.power_pellets = calculate_maze_data(
-            maze_level_1)
+            maze)
 
 
 class Wall(Pen):
