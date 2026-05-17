@@ -59,6 +59,62 @@ class LevelManager:
         return min(base_speed + level_bonus, max_speed)
 
 
+def load_next_level(screen, player, level_manager, score_pen, lives_pen, ui_pen):
+    "Wyczyść scenę i załaduj następny level"
+    # Wyczyść wszystkie obiekty ze sceny
+    screen.clear()
+
+    # Załaduj nową mapę i stwórz nowe obiekty renderowania
+    current_maze = level_manager.get_current_maze()
+    wall_pen = Wall(current_maze)
+    pellet_pen = Pellet(current_maze)
+    power_pen = PowerPellet(current_maze)
+
+    wall_pen.draw()
+    pellet_pen.draw()
+    power_pen.draw()
+    ui_pen.draw_ui_area()
+
+    # Resetuj gracza na nową mapę (score się nie zmienia!)
+    player_start_coor = random.choice(pellet_pen.pellets)
+    player_start_x = player_start_coor[0]
+    player_start_y = player_start_coor[1]
+    player.goto(player_start_x, player_start_y)
+    player.state = "stop"
+
+    # Resetuj wrogów z nową prędkością
+    enemies = []
+    enemy_colors = ["green_enemy.gif", "pink_enemy.gif", "red_enemy.gif"]
+    for _ in range(ENEMY_NUMBER):
+        # Znajdź bezpieczne pozycje dla wrogów (daleko od gracza)
+        safe_spots = []
+        for pellet in pellet_pen.pellets:
+            if player.distance(pellet) > CELL_SIZE * 5:
+                safe_spots.append(pellet)
+        if not safe_spots:
+            safe_spots = pellet_pen.pellets
+        enemy_start_x, enemy_start_y = random.choice(safe_spots)
+        enemy = Enemy(enemy_start_x, enemy_start_y, wall_pen.walls, player)
+        enemy.shape(random.choice(enemy_colors))
+        enemy.move_speed = level_manager.get_enemy_speed()
+        enemies.append(enemy)
+
+    # Resetuj UI
+    new_score_pen = UiPen()
+    new_lives_pen = UiPen()
+
+    # Uruchom grę na nowym levelu
+    screen.ontimer(lambda: bind_controls(screen, player), 2500)
+    for enemy in enemies:
+        screen.ontimer(enemy.start_move, 2500)
+
+    game_loop(
+        screen, player, new_score_pen, new_lives_pen,
+        pellet_pen, power_pen,
+        player_start_x, player_start_y, enemies, level_manager
+    )
+
+
 def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, player_start_x, player_start_y, enemies,_ui_cache=[None, None, None, None]):
     "Aktualizacje w czasie rzeczywistym"
     # Aktualizuj wynik, życia i komunikaty gry – tylko gdy coś się zmieniło
