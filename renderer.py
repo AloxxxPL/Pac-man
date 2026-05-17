@@ -112,6 +112,17 @@ class UiPen(Pen):
         self.clear()
         msg = f"Lives: {lives}"
         self.goto(0.7 * SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 2 * CELL_SIZE)
-        self.write(msg, False, "right", self.font)   
+        self.write(msg, False, "right", self.font)
         if lives == 0 or (len(pellet_stamps) == 0 and len(power_stamps) == 0):
             self.reset()
+
+    def write_final_win(self, final_score):
+        "Wypisz wygranę po skończeniu wszystkich levelów"
+        self.clear()
+        self.color("yellow")
+        self.font = ("Courier", 30, "normal")
+        self.goto(0, 0)
+        self.write(
+            f"You Won All Levels!     Final Score: {final_score}",
+            False, "center", self.font
+        )
