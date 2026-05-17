@@ -18,8 +18,8 @@ class Pen(turtle.Turtle):
 
 class Wall(Pen):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, maze):
+        super().__init__(maze)
         self.shape("wall.gif")
         
     def draw(self):
@@ -30,8 +30,8 @@ class Wall(Pen):
 
 class Pellet(Pen):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, maze):
+        super().__init__(maze)
         self.shape("circle")
         self.shapesize(0.35, 0.35)
         self.pencolor("white")
@@ -49,8 +49,8 @@ class Pellet(Pen):
 
 class PowerPellet(Pen):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, maze):
+        super().__init__(maze)
         self.shape("circle")
         self.shapesize(0.8, 0.8)
         self.pencolor("white")
