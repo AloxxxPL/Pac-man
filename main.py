@@ -115,7 +115,7 @@ def load_next_level(screen, player, level_manager, score_pen, lives_pen, ui_pen)
     )
 
 
-def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, player_start_x, player_start_y, enemies,_ui_cache=[None, None, None, None]):
+def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, player_start_x, player_start_y, enemies, level_manager, _ui_cache=[None, None, None, None]):
     "Aktualizacje w czasie rzeczywistym"
     # Aktualizuj wynik, życia i komunikaty gry – tylko gdy coś się zmieniło
     ui_state = (player.score, player.lives, len(pellet_pen.stamps), len(power_pen.stamps))
@@ -165,13 +165,28 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
                     safe_spots.append(pellet)
             player.goto(random.choice(safe_spots))
             player.lives -= 1        
-    # Wygrana gra – zatrzymaj wszystko i zamknij grę
+    # Koniec levelu – sprawdź czy był ostatni
     if len(power_pen.stamps) == 0 and len(pellet_pen.stamps) == 0:
         player.state = "stop"
         for enemy in enemies:
             enemy.hideturtle()
             enemy.state = "stop"
-        screen.ontimer(screen.bye, 3000)
+
+        # Próba przejścia na następny level
+        if level_manager.next_level():
+            # Następny level dostępny — załaduj nową mapę
+            screen.ontimer(
+                lambda: load_next_level(
+                    screen, player, level_manager,
+                    score_pen, lives_pen, UiPen()
+                ),
+                2000
+            )
+        else:
+            # Koniec gry — wyświetl win screen
+            ui_pen = UiPen()
+            ui_pen.write_final_win(player.score)
+            screen.ontimer(screen.bye, 3000)
     # Koniec gry – zatrzymaj wszystko i zamknij grę
     if player.lives == 0:
         player.state = "stop"
@@ -192,7 +207,8 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
             power_pen,
             player_start_x,
             player_start_y,
-            enemies
+            enemies,
+            level_manager
         ),
         1000 // 60
     )
@@ -252,7 +268,8 @@ def main():
     for enemy in enemies:
         screen.ontimer(enemy.start_move, 2500)
     # Włącz aktualizacje w czasie rzeczywistym
-    game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, player_start_x, player_start_y, enemies)
+    level_manager = LevelManager()
+    game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, player_start_x, player_start_y, enemies, level_manager)
     screen.mainloop()
 
 if __name__ == "__main__":
