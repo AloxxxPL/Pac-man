@@ -1,4 +1,4 @@
-from constants import (CELL_SIZE, MAZE_GRID_ROWS, MAZE_GRID_COLUMNS,MAZE_LEVEL_START_X, MAZE_LEVEL_START_Y)
+from constants import (CELL_SIZE, MAZE_GRID_ROWS, MAZE_GRID_COLUMNS, MAZE_LEVEL_START_X, MAZE_LEVEL_START_Y)
 
 # Poziom labiryntu #1:
 # Liczba wierszy musi być równa liczbie wierszy siatki minus 2 wiersze dla interfejsu użytkownika
@@ -96,7 +96,7 @@ maze_levels = [maze_level_1, maze_level_2, maze_level_3]
 
 
 def calculate_maze_data(maze_level):
-    "Obliczanie współrzędnych labiryntu"
+    """Obliczanie współrzędnych labiryntu"""
     walls = []
     pellets = []
     power_pellets = []
