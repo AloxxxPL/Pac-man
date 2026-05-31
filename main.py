@@ -125,6 +125,18 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
         for enemy in enemies:
             enemy_spawn_positions[enemy] = (round(enemy.xcor()), round(enemy.ycor()))
 
+    # Decrement super mode timer
+    if super_mode_timer > 0:
+        super_mode_timer -= 1
+        if super_mode_timer <= 0:
+            player.super_mode_active = False
+
+    # Decrement and clean up freeze timers
+    for enemy in list(enemy_freeze_timers.keys()):
+        enemy_freeze_timers[enemy] -= 1
+        if enemy_freeze_timers[enemy] <= 0:
+            del enemy_freeze_timers[enemy]
+
     # Aktualizuj wynik, życia i komunikaty gry – tylko gdy coś się zmieniło
     ui_state = (player.score, player.lives, len(pellet_pen.stamps), len(power_pen.stamps))
     if ui_state != (_ui_cache[0], _ui_cache[1], _ui_cache[2], _ui_cache[3]):
@@ -202,6 +214,9 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
         screen.ontimer(screen.bye, 3000)
     # Aktualizuj ekran
     screen.update()
+    # Store state in mutable defaults for next frame
+    _super_mode_timer[0] = super_mode_timer
+    _enemy_freeze_timers[0] = enemy_freeze_timers
     # Powtarzaj funkcję co 16 ms
     screen.ontimer(
         lambda: game_loop(
