@@ -159,6 +159,11 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
             power_pen.clearstamp(stamp_id)
             del power_pen.stamps[(px, py)]
             player.score += 50
+
+            # Activate super mode
+            player.super_mode_active = True
+            super_mode_timer = 300  # 5 seconds @ 60fps
+
             # Przyspieszenie
             player.move_speed += 3
             screen.ontimer(player.reset_speed, 3000)
