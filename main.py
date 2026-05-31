@@ -115,8 +115,16 @@ def load_next_level(screen, player, level_manager, score_pen, lives_pen, ui_pen)
     )
 
 
-def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, player_start_x, player_start_y, enemies, level_manager, _ui_cache=[None, None, None, None]):
+def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, player_start_x, player_start_y, enemies, level_manager, _ui_cache=[None, None, None, None], _super_mode_timer=[0], _enemy_freeze_timers=[{}], _enemy_spawn_positions=[{}]):
     "Aktualizacje w czasie rzeczywistym"
+    super_mode_timer = _super_mode_timer[0]
+    enemy_freeze_timers = _enemy_freeze_timers[0]
+    enemy_spawn_positions = _enemy_spawn_positions[0]
+
+    if not enemy_spawn_positions:
+        for enemy in enemies:
+            enemy_spawn_positions[enemy] = (round(enemy.xcor()), round(enemy.ycor()))
+
     # Aktualizuj wynik, życia i komunikaty gry – tylko gdy coś się zmieniło
     ui_state = (player.score, player.lives, len(pellet_pen.stamps), len(power_pen.stamps))
     if ui_state != (_ui_cache[0], _ui_cache[1], _ui_cache[2], _ui_cache[3]):
