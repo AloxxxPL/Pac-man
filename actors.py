@@ -24,6 +24,7 @@ class Player(Actor):
         self.move_speed = PLAYER_MOVE_SPEED
         self.lives = 3
         self.score = 0
+        self.super_mode_active = False
         self.walls = set(walls)
 
     def move(self):
