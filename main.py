@@ -172,6 +172,10 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
     player.check_wall_collision()
     # Aktualizuj wrogów
     for enemy in enemies:
+        # Skip frozen enemies
+        if enemy in enemy_freeze_timers:
+            continue
+
         enemy.move()
         enemy.check_wall_collision()
         enemy.go_after_player()
