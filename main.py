@@ -181,17 +181,25 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
         enemy.go_after_player()
         # Kolizja: gracz-wróg
         if enemy.distance(player) < CELL_SIZE / 2:
-            os.system("aplay death.wav > /dev/null 2>&1 &")
-            # winsound.PlaySound("death.wav", winsound.SND_ASYNC)
-            # Upewnij się, że gracz nie odradza się blisko wroga
-            safe_spots = []
-            for pellet in pellet_pen.pellets:
-                if all(enemy.distance(pellet) > CELL_SIZE * 5 for enemy in enemies):
-                    safe_spots.append(pellet)
-            if not safe_spots:
-                safe_spots = list(pellet_pen.pellets)
-            player.goto(random.choice(safe_spots))
-            player.lives -= 1        
+            if player.super_mode_active:
+                # Eating enemy in super mode
+                os.system("aplay eat.wav > /dev/null 2>&1 &")
+                enemy.goto(enemy_spawn_positions[enemy])
+                enemy_freeze_timers[enemy] = 900  # 15 seconds @ 60fps
+                player.score += 100
+            else:
+                # Normal collision
+                os.system("aplay death.wav > /dev/null 2>&1 &")
+                # winsound.PlaySound("death.wav", winsound.SND_ASYNC)
+                # Upewnij się, że gracz nie odradza się blisko wroga
+                safe_spots = []
+                for pellet in pellet_pen.pellets:
+                    if all(enemy.distance(pellet) > CELL_SIZE * 5 for enemy in enemies):
+                        safe_spots.append(pellet)
+                if not safe_spots:
+                    safe_spots = list(pellet_pen.pellets)
+                player.goto(random.choice(safe_spots))
+                player.lives -= 1        
     # Koniec levelu – sprawdź czy był ostatni
     if len(power_pen.stamps) == 0 and len(pellet_pen.stamps) == 0:
         player.state = "stop"
