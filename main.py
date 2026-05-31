@@ -246,7 +246,11 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
             player_start_x,
             player_start_y,
             enemies,
-            level_manager
+            level_manager,
+            _ui_cache,
+            _super_mode_timer,
+            _enemy_freeze_timers,
+            _enemy_spawn_positions
         ),
         1000 // 60
     )
