@@ -1,6 +1,7 @@
 import turtle
 import random
 from constants import CELL_SIZE, SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_MOVE_SPEED, ENEMY_MOVE_SPEED, ENEMY_RADAR
+from spatial_grid import SpatialGrid
 
 
 class Actor(turtle.Turtle):
@@ -16,7 +17,7 @@ class Actor(turtle.Turtle):
 
 class Player(Actor):
 
-    def __init__(self, walls):
+    def __init__(self, wall_grid):
         super().__init__()
         self.showturtle()
         self.shape("pac.gif")
@@ -25,7 +26,7 @@ class Player(Actor):
         self.lives = 3
         self.score = 0
         self.super_mode_active = False
-        self.walls = set(walls)
+        self.wall_grid = wall_grid
 
     def move(self):
         self.change_shape_directon()
@@ -46,7 +47,8 @@ class Player(Actor):
         round_y = round(self.ycor())
         heading = self.get_heading()
         half_cell = round(CELL_SIZE / 2)
-        for x, y in self.walls:
+        nearby_walls = self.wall_grid.get_nearby_walls(round_x, round_y, radius_cells=2)
+        for x, y in nearby_walls:
             dx = round_x - x
             dy = round_y - y
             if abs(dx) >= CELL_SIZE * 2 or abs(dy) >= CELL_SIZE * 2:
@@ -122,12 +124,12 @@ class Player(Actor):
 
 class Enemy(Actor):
 
-    def __init__(self, start_x, start_y, walls, player: Player):
+    def __init__(self, start_x, start_y, wall_grid, player: Player):
         super().__init__()
         self.showturtle()
         self.goto(start_x, start_y)
         self.state = "stop"
-        self.walls = set(walls)
+        self.wall_grid = wall_grid
         self.player = player
         self.move_speed = ENEMY_MOVE_SPEED
 
@@ -142,13 +144,14 @@ class Enemy(Actor):
                 self.setx(SCREEN_WIDTH / 2)
             elif round(self.xcor()) > SCREEN_WIDTH / 2:
                 self.setx(-SCREEN_WIDTH / 2)
-    
+
     def check_wall_collision(self):
         round_x = round(self.xcor())
         round_y = round(self.ycor())
         heading = self.get_heading()
         half_cell = round(CELL_SIZE / 2)
-        for x, y in self.walls:
+        nearby_walls = self.wall_grid.get_nearby_walls(round_x, round_y, radius_cells=2)
+        for x, y in nearby_walls:
             dx = round_x - x
             dy = round_y - y
             if abs(dx) >= CELL_SIZE * 2 or abs(dy) >= CELL_SIZE * 2:

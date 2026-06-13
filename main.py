@@ -6,6 +6,7 @@ from constants import SCREEN_WIDTH, SCREEN_HEIGHT, CELL_SIZE, ENEMY_NUMBER, ENEM
 from renderer import Wall, Pellet, PowerPellet, UiPen
 from actors import Player, Enemy
 from mazes import maze_levels
+from spatial_grid import SpatialGrid
 
 
 def init_screen():
@@ -75,12 +76,18 @@ def load_next_level(screen, player, level_manager, score_pen, lives_pen, ui_pen)
     power_pen.draw()
     ui_pen.draw_ui_area()
 
+    # Stwórz spatial grid dla szybkiego collision detection
+    wall_grid = SpatialGrid(wall_pen.walls)
+
     # Resetuj gracza na nową mapę (score się nie zmienia!)
     player_start_coor = random.choice(pellet_pen.pellets)
     player_start_x = player_start_coor[0]
     player_start_y = player_start_coor[1]
     player.goto(player_start_x, player_start_y)
     player.state = "stop"
+
+    # Aktualizuj player grid reference
+    player.wall_grid = wall_grid
 
     # Resetuj wrogów z nową prędkością
     enemies = []
@@ -94,7 +101,7 @@ def load_next_level(screen, player, level_manager, score_pen, lives_pen, ui_pen)
         if not safe_spots:
             safe_spots = pellet_pen.pellets
         enemy_start_x, enemy_start_y = random.choice(safe_spots)
-        enemy = Enemy(enemy_start_x, enemy_start_y, wall_pen.walls, player)
+        enemy = Enemy(enemy_start_x, enemy_start_y, wall_grid, player)
         enemy.shape(random.choice(enemy_colors))
         enemy.move_speed = level_manager.get_enemy_speed()
         enemies.append(enemy)
@@ -292,13 +299,16 @@ def main():
     power_pen.draw()
     ui_pen.draw_ui_area()
 
+    # Stwórz spatial grid dla szybkiego collision detection (O(1) zamiast O(n))
+    wall_grid = SpatialGrid(walls)
+
     # Pozycja startowa gracza
     player_start_coor = random.choice(pellet_pen.pellets)
     player_start_x = player_start_coor[0]
     player_start_y = player_start_coor[1]
 
     # Utwórz Pac-Mana
-    player = Player(walls)
+    player = Player(wall_grid)
     player.goto(player_start_x, player_start_y)
 
     # Utwórz wrogów
@@ -313,7 +323,7 @@ def main():
         if not safe_spots:
             safe_spots = pellets
         enemy_start_x, enemy_start_y = random.choice(safe_spots)
-        enemy = Enemy(enemy_start_x, enemy_start_y, walls, player)
+        enemy = Enemy(enemy_start_x, enemy_start_y, wall_grid, player)
         enemy.shape(random.choice(enemy_colors))
         enemies.append(enemy)
 
