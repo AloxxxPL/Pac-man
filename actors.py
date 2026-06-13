@@ -130,6 +130,10 @@ class Enemy(Actor):
         self.goto(start_x, start_y)
         self.state = "stop"
         self.wall_grid = wall_grid
+        # Store all walls as a set for start_move() checks
+        self.walls = set()
+        for walls_list in wall_grid.grid.values():
+            self.walls.update(walls_list)
         self.player = player
         self.move_speed = ENEMY_MOVE_SPEED
 
