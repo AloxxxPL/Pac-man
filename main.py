@@ -1,6 +1,7 @@
 import turtle
 import random
 import os
+import subprocess
 # import winsound
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT, CELL_SIZE, ENEMY_NUMBER, ENEMY_MOVE_SPEED, PLAYER_MOVE_SPEED
 from renderer import Wall, Pellet, PowerPellet, UiPen
@@ -61,9 +62,9 @@ class LevelManager:
 
 
 def load_next_level(screen, player, level_manager, score_pen, lives_pen, ui_pen):
-    "Wyczyść scenę i załaduj następny level"
-    # Wyczyść wszystkie obiekty ze sceny
+    "Załaduj następny level"
     screen.clear()
+    screen.bgcolor("black")
 
     # Załaduj nową mapę i stwórz nowe obiekty renderowania
     current_maze = level_manager.get_current_maze()
@@ -83,6 +84,7 @@ def load_next_level(screen, player, level_manager, score_pen, lives_pen, ui_pen)
     player_start_coor = random.choice(pellet_pen.pellets)
     player_start_x = player_start_coor[0]
     player_start_y = player_start_coor[1]
+    player.showturtle()
     player.goto(player_start_x, player_start_y)
     player.state = "stop"
 
@@ -110,6 +112,10 @@ def load_next_level(screen, player, level_manager, score_pen, lives_pen, ui_pen)
     new_score_pen = UiPen()
     new_lives_pen = UiPen()
 
+    # WAŻNE: Ustaw shape gracza NA KONIEC, tuż przed game_loop
+    player.shape("pac.gif")
+    player.showturtle()
+
     # Uruchom grę na nowym levelu
     screen.ontimer(lambda: bind_controls(screen, player), 2500)
     for enemy in enemies:
@@ -118,12 +124,21 @@ def load_next_level(screen, player, level_manager, score_pen, lives_pen, ui_pen)
     game_loop(
         screen, player, new_score_pen, new_lives_pen,
         pellet_pen, power_pen,
-        player_start_x, player_start_y, enemies, level_manager
+        player_start_x, player_start_y, enemies, level_manager,
+        _ui_cache=[None, None, None, None],
+        _super_mode_timer=[0],
+        _enemy_freeze_timers=[{}],
+        _enemy_spawn_positions=[{}],  # Reset for new enemies
+        _should_continue=[True]  # Reset flag for new level
     )
 
 
-def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, player_start_x, player_start_y, enemies, level_manager, _ui_cache=[None, None, None, None], _super_mode_timer=[0], _enemy_freeze_timers=[{}], _enemy_spawn_positions=[{}]):
+def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, player_start_x, player_start_y, enemies, level_manager, _ui_cache=[None, None, None, None], _super_mode_timer=[0], _enemy_freeze_timers=[{}], _enemy_spawn_positions=[{}], _should_continue=[True]):
     "Aktualizacje w czasie rzeczywistym"
+    # Check if this game loop should continue
+    if not _should_continue[0]:
+        return
+
     super_mode_timer = _super_mode_timer[0]
     enemy_freeze_timers = _enemy_freeze_timers[0]
     enemy_spawn_positions = _enemy_spawn_positions[0]
@@ -153,7 +168,7 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
     # Kolizja: gracz-kulka
     for (px, py), stamp_id in list(pellet_pen.stamps.items()):
         if player.distance(px, py) < CELL_SIZE / 2:
-            os.system("aplay eat.wav > /dev/null 2>&1 &")
+            subprocess.Popen(["aplay", "eat.wav"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             # winsound.PlaySound("eat.wav", winsound.SND_ASYNC)
             pellet_pen.clearstamp(stamp_id)
             del pellet_pen.stamps[(px, py)]
@@ -161,7 +176,7 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
     # Kolizja: gracz-kulka mocy
     for (px, py), stamp_id in list(power_pen.stamps.items()):
         if player.distance(px, py) < CELL_SIZE / 2:
-            os.system("aplay eat.wav > /dev/null 2>&1 &")
+            subprocess.Popen(["aplay", "eat.wav"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             # winsound.PlaySound("eat.wav", winsound.SND_ASYNC)
             power_pen.clearstamp(stamp_id)
             del power_pen.stamps[(px, py)]
@@ -169,7 +184,7 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
 
             # Activate super mode
             player.super_mode_active = True
-            super_mode_timer = 300  # 5 seconds @ 60fps
+            super_mode_timer = 900  # 15 seconds @ 60fps
 
             # Przyspieszenie
             player.move_speed += 3
@@ -190,13 +205,13 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
         if enemy.distance(player) < CELL_SIZE / 2:
             if player.super_mode_active:
                 # Eating enemy in super mode
-                os.system("aplay eat.wav > /dev/null 2>&1 &")
+                subprocess.Popen(["aplay", "eat.wav"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 enemy.goto(enemy_spawn_positions[enemy])
-                enemy_freeze_timers[enemy] = 900  # 15 seconds @ 60fps
+                enemy_freeze_timers[enemy] = 300  # 5 seconds @ 60fps
                 player.score += 100
             else:
                 # Normal collision
-                os.system("aplay death.wav > /dev/null 2>&1 &")
+                subprocess.Popen(["aplay", "death.wav"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 # winsound.PlaySound("death.wav", winsound.SND_ASYNC)
                 # Upewnij się, że gracz nie odradza się blisko wroga
                 safe_spots = []
@@ -209,6 +224,7 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
                 player.lives -= 1        
     # Koniec levelu – sprawdź czy był ostatni
     if len(power_pen.stamps) == 0 and len(pellet_pen.stamps) == 0:
+        _should_continue[0] = False  # Stop current game loop
         player.state = "stop"
         for enemy in enemies:
             enemy.hideturtle()
@@ -229,38 +245,45 @@ def game_loop(screen, player, score_pen, lives_pen, pellet_pen, power_pen, playe
             ui_pen = UiPen()
             ui_pen.write_final_win(player.score)
             screen.ontimer(screen.bye, 3000)
+        return  # Exit this frame
     # Koniec gry – zatrzymaj wszystko i zamknij grę
     if player.lives == 0:
+        _should_continue[0] = False  # Stop game loop
         player.state = "stop"
         player.hideturtle()
         for enemy in enemies:
             enemy.state = "stop"
         screen.ontimer(screen.bye, 3000)
+        return  # Exit this frame
     # Aktualizuj ekran
     screen.update()
     # Store state in mutable defaults for next frame
     _super_mode_timer[0] = super_mode_timer
     _enemy_freeze_timers[0] = enemy_freeze_timers
-    # Powtarzaj funkcję co 16 ms
-    screen.ontimer(
-        lambda: game_loop(
-            screen,
-            player,
-            score_pen,
-            lives_pen,
-            pellet_pen,
-            power_pen,
-            player_start_x,
-            player_start_y,
-            enemies,
-            level_manager,
-            _ui_cache,
-            _super_mode_timer,
-            _enemy_freeze_timers,
-            _enemy_spawn_positions
-        ),
-        1000 // 60
-    )
+
+    # Only continue game loop if allowed
+    if _should_continue[0]:
+        # Powtarzaj funkcję co 16 ms
+        screen.ontimer(
+            lambda: game_loop(
+                screen,
+                player,
+                score_pen,
+                lives_pen,
+                pellet_pen,
+                power_pen,
+                player_start_x,
+                player_start_y,
+                enemies,
+                level_manager,
+                _ui_cache,
+                _super_mode_timer,
+                _enemy_freeze_timers,
+                _enemy_spawn_positions,
+                _should_continue
+            ),
+            1000 // 60
+        )
 
 
 def main():
@@ -309,7 +332,10 @@ def main():
 
     # Utwórz Pac-Mana
     player = Player(wall_grid)
+    player.showturtle()  # Ensure player is visible
+    player.shape("pac.gif")  # Ensure shape is set
     player.goto(player_start_x, player_start_y)
+    print(f"Player created at ({player_start_x}, {player_start_y})")  # DEBUG
 
     # Utwórz wrogów
     enemy_colors = ["green_enemy.gif", "pink_enemy.gif", "red_enemy.gif"]
@@ -328,7 +354,7 @@ def main():
         enemies.append(enemy)
 
     # Ustawienia startu gry
-    os.system("aplay start_up.wav > /dev/null 2>&1 &")
+    subprocess.Popen(["aplay", "start_up.wav"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     screen.ontimer(lambda: bind_controls(screen, player), 2500)
     for enemy in enemies:
         screen.ontimer(enemy.start_move, 2500)
@@ -338,4 +364,7 @@ def main():
     screen.mainloop()
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except turtle.Terminator:
+        pass  # User closed the window, exit gracefully
