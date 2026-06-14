@@ -2,6 +2,10 @@
 
 Gra Pac-Man zaimplementowana w Pythonie z wykorzystaniem biblioteki `turtle` do renderowania grafiki.
 
+# UPDATE 
+
+Gra Pac-Man została zaktualizowana o wykorzystanie biblioteki pygame
+
 ## Uruchomienie
 
 ```bash
