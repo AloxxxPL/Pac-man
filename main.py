@@ -64,6 +64,7 @@ class Game:
         self.state = "countdown"
         self.state_timer = 150
         self.message = ""
+        self.elapsed_frames = 0
 
         self._load_level(startup=True)
 
@@ -136,6 +137,8 @@ class Game:
         if self.state != "playing":
             self.state_timer -= 1
             return
+
+        self.elapsed_frames += 1
 
         # Super mode countdown
         if self.super_timer > 0:
@@ -222,15 +225,22 @@ class Game:
             self.enemies,
             self.player.score,
             self.player.lives,
+            self.elapsed_frames,
         )
+        total_secs = self.elapsed_frames // 60
+        time_str = f"Time: {total_secs // 60:02d}:{total_secs % 60:02d}"
         if self.state == "countdown":
             self.renderer.draw_message("GET READY!", (255, 255, 0))
         elif self.state == "win":
             self.renderer.draw_message(
-                f"YOU WON ALL LEVELS!  Score: {self.player.score}", (255, 255, 0))
+                f"YOU WON ALL LEVELS!  Score: {self.player.score}",
+                (255, 255, 0),
+                sub_text=time_str)
         elif self.state == "gameover":
             self.renderer.draw_message(
-                f"GAME OVER  Score: {self.player.score}", (220, 0, 0))
+                f"GAME OVER  Score: {self.player.score}",
+                (220, 0, 0),
+                sub_text=time_str)
         elif self.state == "next_level":
             self.renderer.draw_message("LEVEL CLEAR!", (0, 255, 128))
         pygame.display.flip()

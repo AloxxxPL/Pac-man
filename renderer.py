@@ -64,7 +64,7 @@ class Renderer:
             self.draw_actor(enemy, enemy.sprite)
 
     # ----------------------------------------------------------------------- UI
-    def draw_ui(self, score, lives):
+    def draw_ui(self, score, lives, elapsed_frames):
         # Background bar
         pygame.draw.rect(self.screen, (0, 0, 0),
                          (0, 0, SCREEN_WIDTH, UI_HEIGHT))
@@ -78,19 +78,32 @@ class Renderer:
                          (SCREEN_WIDTH - lives_surf.get_width() - 20,
                           (UI_HEIGHT - lives_surf.get_height()) // 2))
 
-    def draw_message(self, text, colour=(255, 255, 0)):
+        total_secs = elapsed_frames // 60
+        time_str = f"Time: {total_secs // 60:02d}:{total_secs % 60:02d}"
+        time_surf = self._font_large.render(time_str, True, (255, 255, 255))
+        self.screen.blit(time_surf,
+                         ((SCREEN_WIDTH - time_surf.get_width()) // 2,
+                          (UI_HEIGHT - time_surf.get_height()) // 2))
+
+    def draw_message(self, text, colour=(255, 255, 0), sub_text=None, sub_colour=(200, 200, 255)):
         surf = self._font_med.render(text, True, colour)
         x = (SCREEN_WIDTH - surf.get_width()) // 2
         y = (SCREEN_HEIGHT - surf.get_height()) // 2
+        if sub_text:
+            y -= surf.get_height() // 2
         self.screen.blit(surf, (x, y))
+        if sub_text:
+            sub_surf = self._font_med.render(sub_text, True, sub_colour)
+            sx = (SCREEN_WIDTH - sub_surf.get_width()) // 2
+            self.screen.blit(sub_surf, (sx, y + surf.get_height() + 10))
 
     # --------------------------------------------------------- full frame draw
-    def draw_frame(self, walls, pellets, power_pellets, player, enemies, score, lives):
+    def draw_frame(self, walls, pellets, power_pellets, player, enemies, score, lives, elapsed_frames):
         self.screen.fill((0, 0, 0))
         self.draw_walls(walls)
         self.draw_pellets(pellets)
         self.draw_power_pellets(power_pellets)
         self.draw_enemies(enemies)
         self.draw_player(player)
-        self.draw_ui(score, lives)
+        self.draw_ui(score, lives, elapsed_frames)
         pygame.display.flip()
